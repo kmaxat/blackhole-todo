@@ -22,3 +22,26 @@ $factory->define(App\Models\User::class, function (Faker\Generator $faker) {
         'remember_token' => str_random(10),
     ];
 });
+
+$factory->define(App\Models\Color::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->colorName,
+        'hex_string' => $faker->hexColor
+    ];
+});
+
+$factory->define(App\Models\Task::class, function (Faker\Generator $faker) {
+    return [
+        'description' => $faker->text(200),
+        'priority' => $faker->randomElement([1,2,3,4]),
+        'user_id' => $faker->numberBetween(1, 10)
+    ];
+});
+
+$factory->define(App\Models\Project::class, function (Faker\Generator $faker) {
+    return [
+        'name' => $faker->streetName,
+        'color_id' => $faker->numberBetween(1, 12)
+    ];
+});
+
