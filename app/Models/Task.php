@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Project;
 
 class Task extends Model
 {
@@ -14,5 +15,7 @@ class Task extends Model
     ];
 
     //Relationships
-
+    public function project(){
+        return $this->belongsTo(Project::class);
+    }
 }
