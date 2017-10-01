@@ -15,7 +15,8 @@ class Project extends Model
     protected $fillable = [
         'name', 'color_id', 'user_id'
     ];
-
+    
+    //Relationships
     public function tasks()
     {
         return $this->hasMany(Task::class);
@@ -23,5 +24,11 @@ class Project extends Model
     public function color()
     {
         return $this->belongsTo(Color::class);
+    }
+
+    //Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('archived', false);
     }
 }

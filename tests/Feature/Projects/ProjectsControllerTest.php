@@ -73,6 +73,7 @@ class ProjectsControllerTest extends TestCase
         $data = [
             'name' => 'New description',
             'color_id' => $newColor->id,
+            'archived' => 0
         ];
         $response = $this->putJson('/api/projects/'.$project->id, $data, $this->headers($user));
         $response->assertStatus(200)->assertJson($data);
@@ -86,7 +87,7 @@ class ProjectsControllerTest extends TestCase
             'user_id' => $user->id,
             'color_id' => $color->id
         ]);
-        $response = $this->deleteJson('/api/projects/'.$project->id,[], $this->headers($user));
+        $response = $this->deleteJson('/api/projects/'.$project->id, [], $this->headers($user));
         $response->assertStatus(200);
     }
 }

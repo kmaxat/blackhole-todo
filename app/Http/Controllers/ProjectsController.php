@@ -14,20 +14,15 @@ class ProjectsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::where('user_id', Auth::id())->with('color')->get();
+        $where[] = ['user_id', '=', Auth::id()];
+        if ($request->has('archived')) {
+            $where[] = ['archived', '=', $request->get('archived')];
+        }
+        $projects = Project::where($where)
+            ->with('color')->get();
         return $projects;
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -94,12 +89,17 @@ class ProjectsController extends Controller
 
         $this->validate($request, [
             'name' => 'required',
-            'color_id' => 'integer|exists:colors,id'
+            'color_id' => 'integer|exists:colors,id',
+            'archived' => 'boolean'
         ]);
+
         $project = Project::where('id', $id)->first();
         if ($project) {
             $project->name = $request->get('name');
             $project->color_id = $request->get('color_id');
+            if ($request->has('boolean')) {
+                $project->archived = $request->get('boolean');
+            }
             $project->save();
             return $project;
         }

@@ -15,7 +15,14 @@ class Task extends Model
     ];
 
     //Relationships
-    public function project(){
+    public function project()
+    {
         return $this->belongsTo(Project::class);
+    }
+
+    //Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('archived', false);
     }
 }
