@@ -41,7 +41,8 @@ $factory->define(App\Models\Task::class, function (Faker\Generator $faker) {
 $factory->define(App\Models\Project::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->streetName,
-        'color_id' => $faker->numberBetween(1, 12)
+        'color_id' => $faker->numberBetween(1, 12),
+        'user_id' => $faker->numberBetween(1,10)
     ];
 });
 

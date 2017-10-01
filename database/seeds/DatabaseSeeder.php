@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
         ]);
         factory(App\Models\User::class, 10)->create();
         factory(App\Models\Color::class, 12)->create();
-        factory(App\Models\Task::class, 100)->create();
-        factory(App\Models\Project::class, 60)->create();
+        factory(App\Models\Project::class, 60)->create()->each(function ($u){
+            $u->tasks()->saveMany(factory(App\Models\Task::class,10)->make());
+        });
     }
 }
