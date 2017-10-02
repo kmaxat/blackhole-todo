@@ -55,24 +55,12 @@ class ProjectsController extends Controller
     public function show($id)
     {
         $task = Project::where('id', $id)->where('user_id', Auth::id())
-        ->with(['color', 'tasks'])
-        ->first();
+            ->with(['color', 'tasks'])
+            ->first();
         if ($task) {
             return $task;
-        } else {
-            return response()->json(['Unauthorized'], 401);
         }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        return response()->json(['Unauthorized'], 401);
     }
 
     /**
@@ -86,20 +74,16 @@ class ProjectsController extends Controller
     {
         //TODO: Any person can update their project. Should be based on permissions
         //TODO: What happens when I edit not my task, user_id shouldn' change
+        //TODO: Add proper json responses
 
         $this->validate($request, [
-            'name' => 'required',
             'color_id' => 'integer|exists:colors,id',
             'archived' => 'boolean'
         ]);
 
         $project = Project::where('id', $id)->first();
         if ($project) {
-            $project->name = $request->get('name');
-            $project->color_id = $request->get('color_id');
-            if ($request->has('boolean')) {
-                $project->archived = $request->get('boolean');
-            }
+            $project->fill($request->all());
             $project->save();
             return $project;
         }
@@ -113,9 +97,9 @@ class ProjectsController extends Controller
      */
     public function destroy($id)
     {
-         //TODO: Proper response for delete
-         //TODO: What happens when I delete not my project
-         $project = Project::destroy($id);
-         return $project;
+    //TODO: Proper response for delete
+    //TODO: What happens when I delete not my project
+        $project = Project::destroy($id);
+        return $project;
     }
 }

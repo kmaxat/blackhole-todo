@@ -79,6 +79,21 @@ class ProjectsControllerTest extends TestCase
         $response->assertStatus(200)->assertJson($data);
     }
 
+    public function testArchiveProject()
+    {
+        $user = factory(User::class)->create();
+        $color = factory(Color::class)->create();
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id,
+            'color_id' => $color->id
+        ]);
+        $data = [
+            'archived' => true
+        ];
+        $response = $this->putJson('/api/projects/'.$project->id, $data, $this->headers($user));
+        $response->assertStatus(200)->assertJson($data);
+    }
+
     public function testDeleteProject()
     {
         $user = factory(User::class)->create();

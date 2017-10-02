@@ -13,7 +13,11 @@ class Project extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name', 'color_id', 'user_id'
+        'name', 'color_id', 'user_id', 'archived'
+    ];
+
+    protected $hidden = [
+        'deleted_at'
     ];
     
     //Relationships
