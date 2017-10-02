@@ -93,6 +93,20 @@ class TasksControllerTest extends TestCase
         $response->assertStatus(200)->assertJson($data);
     }
 
+    public function testArchiveTask()
+    {
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->create([
+            'user_id' => $user->id
+        ]);
+        $data = [
+            'description' => 'New description',
+            'archived' => true,
+        ];
+        $response = $this->putJson('/api/tasks/'.$task->id, $data, $this->headers($user));
+        $response->assertStatus(200)->assertJson($data);
+    }
+
     public function testDeleteTask()
     {
         $user = factory(User::class)->create();

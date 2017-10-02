@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon;
+use Log;
 
 class TasksController extends Controller
 {
@@ -76,8 +77,11 @@ class TasksController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //TODO: What happens if I don't send the archive,
+        //or send some arbitrary value
         $this->validate($request, [
-            'priority' => 'integer|min:1|max:4'
+            'priority' => 'integer|min:1|max:4',
+            'archived' => 'boolean'
         ]);
         $task = Task::where('id', $id)->first();
         if ($task) {
