@@ -6,6 +6,8 @@ use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use Carbon\Carbon;
+
 class TasksController extends Controller
 {
     /**
@@ -15,7 +17,16 @@ class TasksController extends Controller
      */
     public function index(Request $request)
     {
-        $tasks = Task::where('user_id', Auth::id())->get();
+        $where[] = ['user_id', '=', Auth::id()];
+        if ($request->has('range')) {
+            $range = $request->get('range');
+            if ($range == 'today') {
+                $where[] = ['due_at','<=', Carbon::today()];
+            } elseif ($range == 'week') {
+                $where[] = ['due_at', '<=', Carbon::today()->addDays(7)];
+            }
+        }
+        $tasks = Task::where($where)->get();
         return $tasks;
     }
 
@@ -51,8 +62,9 @@ class TasksController extends Controller
         $task = Task::where('id', $id)->where('user_id', Auth::id())->first();
         if ($task) {
             return $task;
-        } else
-            return response()->json(['Unauthorized'],401);
+        } else {
+            return response()->json(['Unauthorized'], 401);
+        }
     }
 
     /**
