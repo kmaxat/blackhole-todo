@@ -11,7 +11,7 @@ class Task extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'description', 'priority', 'user_id', 'due_at','archived'
+        'description', 'priority', 'user_id', 'due_at','archived', 'project_id'
     ];
 
     protected $hidden = [

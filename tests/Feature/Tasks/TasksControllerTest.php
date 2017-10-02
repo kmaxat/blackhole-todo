@@ -4,6 +4,8 @@ namespace Tests\Feature\Tasks;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Project;
+use App\Models\Color;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
@@ -103,7 +105,50 @@ class TasksControllerTest extends TestCase
             'description' => 'New description',
             'archived' => true,
         ];
-        $response = $this->putJson('/api/tasks/'.$task->id, $data, $this->headers($user));
+        $response = $this->putJson(
+            '/api/tasks/'.$task->id,
+            $data,
+            $this->headers($user)
+        );
+        $response->assertStatus(200)->assertJson($data);
+    }
+
+    public function testAttachTaskToProject()
+    {
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->create([
+            'user_id' => $user->id
+        ]);
+        $color = factory(Color::class)->create();
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id,
+            'color_id' => $color->id
+        ]);
+        $data = [
+            'project_id' => $project->id,
+        ];
+        $response = $this->putJson(
+            '/api/tasks/'.$task->id,
+            $data,
+            $this->headers($user)
+        );
+        $response->assertStatus(200)->assertJson($data);
+    }
+
+    public function testTaskDueDate()
+    {
+        $user = factory(User::class)->create();
+        $task = factory(Task::class)->create([
+            'user_id' => $user->id
+        ]);
+        $data = [
+            'due_at' => Carbon::today()->addWeek(1)->toDateTimeString()
+        ];
+        $response = $this->putJson(
+            '/api/tasks/'.$task->id,
+            $data,
+            $this->headers($user)
+        );
         $response->assertStatus(200)->assertJson($data);
     }
 
@@ -113,7 +158,11 @@ class TasksControllerTest extends TestCase
         $task = factory(Task::class)->create([
             'user_id' => $user->id
         ]);
-        $response = $this->deleteJson('/api/tasks/'.$task->id, [], $this->headers($user));
+        $response = $this->deleteJson(
+            '/api/tasks/'.$task->id,
+            [],
+            $this->headers($user)
+        );
         $response->assertStatus(200);
     }
 }

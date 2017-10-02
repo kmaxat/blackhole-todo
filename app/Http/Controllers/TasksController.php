@@ -63,9 +63,8 @@ class TasksController extends Controller
         $task = Task::where('id', $id)->where('user_id', Auth::id())->first();
         if ($task) {
             return $task;
-        } else {
-            return response()->json(['Unauthorized'], 401);
         }
+        return response()->json(['Unauthorized'], 401);
     }
 
     /**
@@ -81,7 +80,9 @@ class TasksController extends Controller
         //or send some arbitrary value
         $this->validate($request, [
             'priority' => 'integer|min:1|max:4',
-            'archived' => 'boolean'
+            'archived' => 'boolean',
+            'project_id' => 'exists:projects,id',
+            'due_at' => 'date'
         ]);
         $task = Task::where('id', $id)->first();
         if ($task) {
