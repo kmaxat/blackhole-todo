@@ -10,18 +10,16 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
-    protected static $migrationsRun = false;
-
 
     //TODO: Properly setup testing database (find the side effects)
     public function setUp()
     {
         parent::setUp();
-        if (!static::$migrationsRun) {
-            Log::info('run');
-            Artisan::call('migrate');
-            static::$migrationsRun = true;
-        }
+        // if (!static::$migrationsRun) {
+            // Log::info('run');
+            // Artisan::call('migrate');
+            // static::$migrationsRun = true;
+        // }
     }
 
     protected function headers($user = null)

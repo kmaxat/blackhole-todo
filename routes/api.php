@@ -20,7 +20,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     });
     Route::resource('tasks', 'TasksController');
     Route::resource('projects', 'ProjectsController');
-    
 });
 
 Route::group(['middleware' => 'guest:api'], function () {
