@@ -27,7 +27,7 @@ class TasksController extends Controller
                 $where[] = ['due_at', '<=', Carbon::today()->addDays(7)];
             }
         }
-        $tasks = Task::where($where)->get();
+        $tasks = Task::where($where)->orderBy('due_at')->get();
         return $tasks;
     }
 
@@ -41,13 +41,17 @@ class TasksController extends Controller
     {
         $this->validate($request, [
             'description' => 'required',
-            'priority' => 'integer|min:1|max:4'
+            'priority' => 'integer|min:1|max:4',
+            'project_id' => 'exists:projects,id',
+            'due_at' => 'date'
         ]);
 
         $task = Task::create([
             'description' => $request->get('description'),
             'priority' => $request->get('priority'),
             'user_id' => Auth::id(),
+            'project_id' => $request->get('project_id'),
+            'due_at' => $request->get('due_at')
         ]);
         return $task;
     }
@@ -80,7 +84,7 @@ class TasksController extends Controller
         //or send some arbitrary value
         $this->validate($request, [
             'priority' => 'integer|min:1|max:4',
-            'archived' => 'boolean',
+            'status' => 'in:archived,deleted,completed',
             'project_id' => 'exists:projects,id',
             'due_at' => 'date'
         ]);

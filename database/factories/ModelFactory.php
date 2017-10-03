@@ -35,8 +35,12 @@ $factory->define(App\Models\Task::class, function (Faker\Generator $faker) {
     return [
         'description' => $faker->text(200),
         'priority' => $faker->randomElement([1,2,3,4]),
-        'due_at' => Carbon::instance($faker->dateTime)->toDateTimeString(),
-        'user_id' => $faker->numberBetween(1, 10)
+        'due_at' => Carbon::today()
+                        ->addWeek($faker->numberBetween(1, 10))
+                        ->toDateTimeString(),
+        'user_id' => $faker->numberBetween(1, 10),
+        'status' => $faker->randomElement(['archived','completed', 'deleted']),
+        'project_id' => null
     ];
 });
 
