@@ -39,7 +39,7 @@ $factory->define(App\Models\Task::class, function (Faker\Generator $faker) {
                         ->addWeek($faker->numberBetween(1, 10))
                         ->toDateTimeString(),
         'user_id' => $faker->numberBetween(1, 10),
-        'status' => $faker->randomElement(['archived','completed', 'deleted']),
+        'status' => $faker->randomElement(['archived','completed', 'deleted', null]),
         'project_id' => null
     ];
 });
@@ -48,6 +48,8 @@ $factory->define(App\Models\Project::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->streetName,
         'color_id' => $faker->numberBetween(1, 12),
-        'user_id' => $faker->numberBetween(1, 10)
+        'user_id' => 1,
+        'status' => $faker->randomElement(['archived', 'deleted', null]),
+        // 'user_id' => $faker->numberBetween(1, 10)
     ];
 });
