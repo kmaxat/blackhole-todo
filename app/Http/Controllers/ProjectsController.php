@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Project;
 
 use Auth;
+use Log;
 
 class ProjectsController extends Controller
 {
@@ -17,10 +18,7 @@ class ProjectsController extends Controller
     public function index(Request $request)
     {
         $where[] = ['user_id', '=', Auth::id()];
-        if ($request->has('archived')) {
-            $where[] = ['archived', '=', $request->get('archived')];
-        }
-        $projects = Project::where($where)
+        $projects = Project::active()->where($where)
             ->with('color')->get();
         return $projects;
     }
@@ -75,10 +73,10 @@ class ProjectsController extends Controller
         //TODO: Any person can update their project. Should be based on permissions
         //TODO: What happens when I edit not my task, user_id shouldn' change
         //TODO: Add proper json responses
-
+        Log::info($request->all());
         $this->validate($request, [
             'color_id' => 'integer|exists:colors,id',
-            'archived' => 'boolean'
+            'status' => 'in:archived'
         ]);
 
         $project = Project::where('id', $id)->first();

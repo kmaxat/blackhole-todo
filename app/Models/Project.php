@@ -10,16 +10,10 @@ use App\Models\Color;
 
 class Project extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
-        'name', 'color_id', 'user_id', 'archived'
+        'name', 'color_id', 'user_id', 'status'
     ];
 
-    protected $hidden = [
-        'deleted_at'
-    ];
-    
     //Relationships
     public function tasks()
     {
@@ -33,6 +27,6 @@ class Project extends Model
     //Scopes
     public function scopeActive($query)
     {
-        return $query->where('archived', false);
+        return $query->where('status', null);
     }
 }
