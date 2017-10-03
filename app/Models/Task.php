@@ -20,9 +20,8 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
-    //Scopes
     public function scopeActive($query)
     {
-        return $query->where('archived', false);
+        return $query->where('status', null);
     }
 }

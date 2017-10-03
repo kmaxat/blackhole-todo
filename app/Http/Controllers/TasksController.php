@@ -27,7 +27,7 @@ class TasksController extends Controller
                 $where[] = ['due_at', '<=', Carbon::today()->addDays(7)];
             }
         }
-        $tasks = Task::where($where)->orderBy('due_at')->get();
+        $tasks = Task::active()->where($where)->orderBy('due_at')->get();
         return $tasks;
     }
 
