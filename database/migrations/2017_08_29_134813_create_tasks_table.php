@@ -20,8 +20,7 @@ class CreateTasksTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->dateTime('due_at')->nullable();
-            $table->boolean('archived')->default(false);
-            $table->softDeletes();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

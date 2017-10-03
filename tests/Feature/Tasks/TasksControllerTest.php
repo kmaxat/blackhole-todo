@@ -25,8 +25,11 @@ class TasksControllerTest extends TestCase
         $tasks = factory(Task::class, 10)->create([
             'user_id' => $user->id,
         ]);
+    
         $response = $this->getJson('/api/tasks', $this->headers($user));
-        $response->assertStatus(200)->assertJson($tasks->toArray());
+        $response->assertStatus(200)->assertJson(
+            $tasks->sortBy('due_at')->values()->toArray()
+        );
     }
 
     public function testGetTodayTasks()
@@ -103,7 +106,7 @@ class TasksControllerTest extends TestCase
         ]);
         $data = [
             'description' => 'New description',
-            'archived' => true,
+            'status' => 'archived',
         ];
         $response = $this->putJson(
             '/api/tasks/'.$task->id,

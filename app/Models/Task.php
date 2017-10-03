@@ -8,14 +8,10 @@ use App\Models\Project;
 
 class Task extends Model
 {
-    use SoftDeletes;
 
     protected $fillable = [
-        'description', 'priority', 'user_id', 'due_at','archived', 'project_id'
-    ];
-
-    protected $hidden = [
-        'deleted_at'
+        'description', 'priority', 'user_id', 'due_at', 'project_id',
+        'status'
     ];
 
     //Relationships
