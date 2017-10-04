@@ -23,9 +23,12 @@ class ProjectsControllerTest extends TestCase
             'user_id' => $user->id,
             'color_id' => $color->id
         ]);
+        $activeProjects = $projects->filter(function ($project) {
+            return $project->status == null;
+        });
         $response = $this->getJson('/api/projects', $this->headers($user));
         $response->assertStatus(200)
-            ->assertJson($projects->toArray())
+            ->assertJson($activeProjects->values()->toArray())
             ->assertJsonFragment(['color' => $color->toArray()]);
     }
 
@@ -73,7 +76,7 @@ class ProjectsControllerTest extends TestCase
         $data = [
             'name' => 'New description',
             'color_id' => $newColor->id,
-            'archived' => 0
+            'status' => 'archived'
         ];
         $response = $this->putJson('/api/projects/'.$project->id, $data, $this->headers($user));
         $response->assertStatus(200)->assertJson($data);
@@ -88,7 +91,7 @@ class ProjectsControllerTest extends TestCase
             'color_id' => $color->id
         ]);
         $data = [
-            'archived' => true
+            'status' => 'archived'
         ];
         $response = $this->putJson('/api/projects/'.$project->id, $data, $this->headers($user));
         $response->assertStatus(200)->assertJson($data);
