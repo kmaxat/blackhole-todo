@@ -25,10 +25,14 @@ class TasksControllerTest extends TestCase
         $tasks = factory(Task::class, 10)->create([
             'user_id' => $user->id,
         ]);
-    
+
         $response = $this->getJson('/api/tasks', $this->headers($user));
-        $response->assertStatus(200)->assertJson(
-            $tasks->sortBy('due_at')->values()->toArray()
+       
+        $activeTasks = $tasks->filter(function ($task) {
+            return $task->status == null;
+        });
+        $response->assertStatus(200)->assertExactJson(
+            $activeTasks->sortBy('due_at')->values()->toArray()
         );
     }
 
@@ -43,9 +47,15 @@ class TasksControllerTest extends TestCase
             'user_id' => $user->id,
             'due_at' => Carbon::today()->toDateTimeString()
         ]);
-        $weekOldTasks->merge($todayTasks);
+        ;
         $response = $this->getJson('/api/tasks', $this->headers($user));
-        $response->assertStatus(200)->assertJson($weekOldTasks->toArray());
+        $activeTasks = $weekOldTasks->merge($todayTasks)
+            ->filter(function ($task) {
+                return $task->status == null;
+            });
+        $response->assertStatus(200)->assertExactJson(
+            $activeTasks->sortBy('due_at')->values()->toArray()
+        );
     }
     public function getTodayTasks()
     {
