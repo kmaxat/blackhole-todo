@@ -9,9 +9,9 @@
          processIsolation="false"
          stopOnFailure="true"
          stopOnError="true"
-         stopOnIncomplete="true"
-         stopOnSkipped="true"
-         stopOnRisky="true">
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         stopOnRisky="false">
     <testsuites>
         <testsuite name="Feature">
             <directory suffix="Test.php">./tests/Feature</directory>

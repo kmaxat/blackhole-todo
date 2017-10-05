@@ -27,6 +27,22 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password', 'remember_token',
     ];
+    
+    //Relationships
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    public function labels()
+    {
+        return $this->hasMany(Label::class);
+    }
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

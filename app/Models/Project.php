@@ -15,13 +15,24 @@ class Project extends Model
     ];
 
     //Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function tasks()
     {
         return $this->hasMany(Task::class);
     }
+    
     public function color()
     {
         return $this->belongsTo(Color::class);
+    }
+
+    public function labels()
+    {
+        return $this->morphToMany('App\Models\Label', 'labellable');
     }
 
     //Scopes

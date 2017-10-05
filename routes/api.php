@@ -21,6 +21,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::resource('tasks', 'TasksController');
     Route::resource('projects', 'ProjectsController');
     Route::resource('colors', 'ColorsController');
+    Route::resource('labels', 'LabelsController');
 });
 
 Route::group(['middleware' => 'guest:api'], function () {

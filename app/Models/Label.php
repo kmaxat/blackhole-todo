@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Label extends Model
 {
-    protected $fillabe = [
+    protected $fillable = [
         'name', 'color_id', 'user_id'
     ];
 
@@ -15,9 +15,9 @@ class Label extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function tags()
+    public function tasks()
     {
-        return $this->morphedByMany('App\Models\Tag', 'labellable');
+        return $this->morphedByMany('App\Models\Task', 'labellable');
     }
 
     public function projects()

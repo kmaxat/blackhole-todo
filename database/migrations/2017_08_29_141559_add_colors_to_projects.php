@@ -15,7 +15,7 @@ class AddColorsToProjects extends Migration
     {
         Schema::table('projects', function (Blueprint $table) {
             $table->integer('color_id')->unsigned();
-            $table->foreign('color_id')->references('id')->on('colors');
+            $table->foreign('color_id')->references('id')->on('colors')->onDelete('cascade');
         });
     }
 
