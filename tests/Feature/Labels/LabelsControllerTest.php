@@ -9,6 +9,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\Label;
 use App\Models\User;
 use App\Models\Color;
+use App\Models\Project;
+use App\Models\Task;
+
 use Log;
 
 class LabelsControllerTest extends TestCase
@@ -75,34 +78,51 @@ class LabelsControllerTest extends TestCase
     
     public function testAttachLabelToProject()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        $user = factory(User::class)->create();
+        $color = factory(Color::class)->create();
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id,
+            'color_id' => $color->id
+        ]);
+        $label = factory(Label::class)->create([
+            'user_id' => $user->id,
+            'color_id' => $color->id,
+            'name' => 'Urgent',
+        ]);
+        $data = [
+            'project_id' => $project->id
+        ];
+
+        $response = $this->putJson(
+            '/api/labels/'.$label->id,
+            $data,
+            $this->headers($user)
         );
-        // $user = factory(User::class)->create();
-        // $task = factory(Label::class)->create([
-        // 'user_id' => $user->id
-        // ]);
-        // $color = factory(Color::class)->create();
-        // $project = factory(Project::class)->create([
-        // 'user_id' => $user->id,
-        // 'color_id' => $color->id
-        // ]);
-        // $data = [
-        // 'project_id' => $project->id,
-        // ];
-        // $response = $this->putJson(
-        // '/api/labels/'.$task->id,
-        // $data,
-        // $this->headers($user)
-        // );
-        // $response->assertStatus(200)->assertJson($data);
+        $response->assertStatus(200)->assertJson($label->toArray());
     }
 
     public function testAttachLabelToTask()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        $user = factory(User::class)->create();
+        $color = factory(Color::class)->create();
+        $task = factory(Task::class)->create([
+            'user_id' => $user->id,
+        ]);
+        $label = factory(Label::class)->create([
+            'user_id' => $user->id,
+            'color_id' => $color->id,
+            'name' => 'Urgent',
+        ]);
+        $data = [
+            'task_id' => $task->id
+        ];
+
+        $response = $this->putJson(
+            '/api/labels/'.$label->id,
+            $data,
+            $this->headers($user)
         );
+        $response->assertStatus(200)->assertJson($label->toArray());
     }
     
     public function testDeleteLabel()
