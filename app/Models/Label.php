@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Label extends Model
 {
-    protected $fillabe = [
+    protected $fillable = [
         'name', 'color_id', 'user_id'
     ];
 
