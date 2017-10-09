@@ -16,7 +16,8 @@ class CreateTableLabellable extends Migration
         Schema::create('labellables', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('label_id')->unsigned();
-            $table->foreign('label_id')->references('id')->on('labels');
+            $table->foreign('label_id')->references('id')->on('labels')
+                ->onDelete('cascade');
             $table->integer('labellable_id');
             $table->string('labellable_type');
             $table->unique(['label_id', 'labellable_id', 'labellable_type']);

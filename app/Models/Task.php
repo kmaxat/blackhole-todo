@@ -25,7 +25,7 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function label()
+    public function labels()
     {
         return $this->morphToMany('App\Models\Label', 'labellable');
     }

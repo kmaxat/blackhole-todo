@@ -7,6 +7,7 @@ use App\Models\Project;
 
 use Auth;
 use Log;
+use DB;
 
 class ProjectsController extends Controller
 {
@@ -15,11 +16,11 @@ class ProjectsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $where[] = ['user_id', '=', Auth::id()];
-        $projects = Project::active()->where($where)
-            ->with('color')->get();
+        $projects = Project::active()->where($where)->with(['color','labels'])
+        ->get();
         return $projects;
     }
 
@@ -32,14 +33,14 @@ class ProjectsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required',
-            'color_id' => 'integer|exists:colors,id'
+        'name' => 'required',
+        'color_id' => 'integer|exists:colors,id'
         ]);
 
         $project = Project::create([
-            'name' => $request->get('name'),
-            'color_id' => $request->get('color_id'),
-            'user_id' => Auth::id(),
+        'name' => $request->get('name'),
+        'color_id' => $request->get('color_id'),
+        'user_id' => Auth::id(),
         ]);
         return $project;
     }
@@ -53,8 +54,8 @@ class ProjectsController extends Controller
     public function show($id)
     {
         $task = Project::where('id', $id)->where('user_id', Auth::id())
-            ->with(['color', 'tasks'])
-            ->first();
+        ->with(['color', 'tasks'])
+        ->first();
         if ($task) {
             return $task;
         }
@@ -76,15 +77,58 @@ class ProjectsController extends Controller
         Log::info($request->all());
         $this->validate($request, [
             'color_id' => 'integer|exists:colors,id',
-            'status' => 'in:archived'
+            'status' => 'in:archived',
+            'label_id' => 'exists:labels,id',
         ]);
 
         $project = Project::where('id', $id)->first();
-        if ($project) {
-            $project->fill($request->all());
-            $project->save();
-            return $project;
+        if (!$project) {
+            return json()->response()->json([
+            'message' => 'Not found'
+            ], 404);
         }
+
+        if ($request->has('label_id')) {
+            $labelIds = collect($request->get('label_id'))->values();
+            
+            //Retrieve currently existing labels
+            $projectAttached = DB::table('labellables')
+            ->where('labellable_id', $project->id)
+            ->where('labellable_type', 'App\Models\Project')->get();
+            
+            //Intersect $labelIds and $projectAttached ids. Add not existing,
+            //remove existing
+            $newLabels = $labelIds->values()->toArray();
+            $existingLabels = $projectAttached->pluck('label_id')->toArray();
+            
+            //Diff to create new labels
+            $insertIds = array_diff($newLabels, $existingLabels);
+            $insertQuery = [];
+            foreach ($insertIds as $key => $newLabel) {
+                $insertQuery[] = [
+                    'label_id' => $newLabel,
+                    'labellable_id' => $project->id,
+                    'labellable_type' => 'App\Models\Project'
+                ];
+            }
+            DB::table('labellables')->insert($insertQuery);
+
+            //Diff to delete no longer used labels
+            $labelsToDelete = array_diff($existingLabels, $newLabels);
+            $idsToDelete = [];
+            foreach ($labelsToDelete as $key => $labelToDelete) {
+                $idsToDelete[] = $labelToDelete;
+            }
+            DB::table('labellables')
+                ->where('labellable_type', 'App\Models\Project')
+                ->where('labellable_id', $project->id)
+                ->whereIn('label_id', $idsToDelete)
+                ->delete();
+        }
+
+        $project->fill($request->all());
+        $project->save();
+        return $project->load('labels');
     }
 
     /**

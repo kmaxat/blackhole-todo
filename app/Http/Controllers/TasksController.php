@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon;
 use Log;
+use DB;
 
 class TasksController extends Controller
 {
@@ -27,7 +28,7 @@ class TasksController extends Controller
                 $where[] = ['due_at', '<=', Carbon::today()->addDays(7)];
             }
         }
-        $tasks = Task::active()->where($where)->orderBy('due_at')->get();
+        $tasks = Task::active()->with('labels')->where($where)->orderBy('due_at')->get();
         return $tasks;
     }
 
@@ -86,14 +87,55 @@ class TasksController extends Controller
             'priority' => 'integer|min:1|max:4',
             'status' => 'in:archived,deleted,completed',
             'project_id' => 'exists:projects,id',
-            'due_at' => 'date'
+            'due_at' => 'date',
+            'label_id' => 'exists:labels,id',
         ]);
         $task = Task::where('id', $id)->first();
-        if ($task) {
-            $task->fill($request->all());
-            $task->save();
-            return $task;
+        if (!$task) {
+            return json()->response()->json([
+                'message' => 'Not found'
+                ], 404);
         }
+
+        if ($request->has('label_id')) {
+            $labelIds = collect($request->get('label_id'))->values();
+            //Retrieve currently existing labels
+            $tasksAttached = DB::table('labellables')
+            ->where('labellable_id', $task->id)
+            ->where('labellable_type', 'App\Models\Task')->get();
+            
+            //Intersect $labelIds and $tasksAttached ids. Add not existing,
+            //remove existing
+            $newLabels = $labelIds->values()->toArray();
+            $existingLabels = $tasksAttached->pluck('label_id')->toArray();
+            
+            //Diff to create new labels
+            $insertIds = array_diff($newLabels, $existingLabels);
+            $insertQuery = [];
+            foreach ($insertIds as $key => $newLabel) {
+                $insertQuery[] = [
+                    'label_id' => $newLabel,
+                    'labellable_id' => $task->id,
+                    'labellable_type' => 'App\Models\Task'
+                ];
+            }
+            DB::table('labellables')->insert($insertQuery);
+
+            //Diff to delete no longer used labels
+            $labelsToDelete = array_diff($existingLabels, $newLabels);
+            $idsToDelete = [];
+            foreach ($labelsToDelete as $key => $labelToDelete) {
+                $idsToDelete[] = $labelToDelete;
+            }
+            DB::table('labellables')
+                ->where('labellable_type', 'App\Models\Task')
+                ->where('labellable_id', $task->id)
+                ->whereIn('label_id', $idsToDelete)
+                ->delete();
+        }
+        $task->fill($request->all());
+        $task->save();
+        return $task->load('labels');
     }
 
     /**
