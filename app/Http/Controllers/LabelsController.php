@@ -53,7 +53,6 @@ class LabelsController extends Controller
     {
         $this->validate($request, [
             'color_id' => 'exists:colors,id',
-            'project_id' => 'exists:projects,id',
             'task_id' => 'exists:tasks,id',
         ]);
 
@@ -62,16 +61,7 @@ class LabelsController extends Controller
             return response()->json('Not found', 404);
         };
 
-        if ($request->has('project_id')) {
-            $projectAttached = DB::table('labellables')
-                ->where('label_id', $label->id)
-                ->where('labellable_id', $request->get('project_id'))
-                ->where('labellable_type', 'App\Models\Project')->first();
-
-            if (!$projectAttached) {
-                $label->projects()->attach($request->get('project_id'));
-            }
-        }
+        
         if ($request->has('task_id')) {
             $taskAttached = DB::table('labellables')
             ->where('label_id', $label->id)
